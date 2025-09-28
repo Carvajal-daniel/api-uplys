@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Application } from "express";
 import * as express from "express";
 import userRoutes from "./infra/routes/user.routes";
@@ -11,7 +12,7 @@ export class App {
     this.app.use(express.json());
     this.app.use(
       cors({
-        origin: "http://localhost:3001",
+        origin: process.env.ORIGIN || "http://localhost:3000",
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],

@@ -3,20 +3,32 @@ import * as express from "express";
 import userRoutes from "./infra/routes/user.routes";
 import * as cors from "cors";
 
+
+const allowedOrigins = [
+  "http://localhost:3001",
+  "https://uplys.vercel.app"
+];
 export class App {
   public app: Application;
+
+  
 
   constructor() {
     this.app = express();
     this.app.use(express.json());
-    this.app.use(
-      cors({
-        origin: process.env.ORIGIN || "http://localhost:3001",
-        credentials: true,
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-      })
-    );
+   this.app.use(
+  cors({
+    origin: (origin, callback) => {
+      // permitir requisições sem origin (Postman, CURL)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error("Não permitido por CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
     // Configura as rotas
     this.setupRoutes();

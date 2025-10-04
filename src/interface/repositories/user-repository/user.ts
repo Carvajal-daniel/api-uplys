@@ -3,26 +3,24 @@ import type { IUserRepository } from "../../../domain/user/user-repository";
 import { userTable } from "../../../infra/db/schema";
 import { db } from "../../../infra/db";
 import { logger } from "../../../shared/userLogs/logger";
-import { eq, or } from "drizzle-orm"; // Removido 'and'
+import { eq, or } from "drizzle-orm";
 
 export class UserRepository implements IUserRepository {
   async create(userData: UserProps): Promise<UserProps> {
     try {
-      // 1. Verifica se já existe usuário com email, cpf OU telefone
       const existing = await db.select()
         .from(userTable)
         .where(
           or(
             eq(userTable.email, userData.email),
             eq(userTable.cpf, userData.cpf),
-            eq(userTable.phone, userData.phone) // 🚨 ADICIONADO: Verificação de telefone
+            eq(userTable.phone, userData.phone) 
           )
         )
         .limit(1) 
-        .execute(); // Certifique-se de que .execute() está presente para rodar a query
+        .execute(); 
 
       if (existing.length > 0) {
-        // 2. Lança erros específicos para duplicidade
         
         const existingUser = existing[0];
 
@@ -48,4 +46,26 @@ export class UserRepository implements IUserRepository {
       throw error; 
     }
   }
+
+ async findByEmail(email: string): Promise<UserProps | null>{
+    try {
+      const [user] = await db.select()
+        .from(userTable)
+        .where(eq(userTable.email, email))
+        .limit(1)
+        .execute();
+
+      if(!user){
+        logger.warn(`EMAIL_NOT_FOUND: Email ${email} não encontrado`);
+        return null;
+      }
+
+       return user as UserProps;
+       
+    } catch (error: any) {
+       logger.error("Erro ao buscar usuário para login: %o", { error, email });
+       throw error;
+    }
+  }
+
 }

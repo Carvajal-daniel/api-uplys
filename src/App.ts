@@ -19,7 +19,6 @@ export class App {
    this.app.use(
   cors({
     origin: (origin, callback) => {
-      // permitir requisições sem origin (Postman, CURL)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
       callback(new Error("Não permitido por CORS"));

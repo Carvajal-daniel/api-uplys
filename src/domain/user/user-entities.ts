@@ -19,3 +19,10 @@ export interface CreateUserDTO {
   phone: string;
   password: string;
 }
+
+export interface LoginDTO {
+  email: string;
+  password: string;
+}
+
+export type AuthenticatedUser = Omit<UserProps, 'password'>;

@@ -7,6 +7,7 @@ export const userTable = pgTable("user", {
   cpf: text("cpf").notNull().unique(),
   phone: text("phone").notNull().unique(),
   email: text("email").notNull().unique(),
+  password: text("password").notNull(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

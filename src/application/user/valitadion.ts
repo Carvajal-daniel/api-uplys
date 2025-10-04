@@ -31,3 +31,6 @@ export const ValidateUser = z
   });
 
 export type ValidateUserDTO = z.infer<typeof ValidateUser>;
+export const ValidateLogin = ValidateUser.pick({ email: true, password: true });
+
+export type ValidateLoginDTO = z.infer<typeof ValidateLogin>;

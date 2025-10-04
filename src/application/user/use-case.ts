@@ -4,7 +4,7 @@ import type { CreateUserDTO, UserProps } from "../../domain/user/user-entities";
 import { ValidateUser } from "./valitadion";
 import type { BcryptService } from "../../infra/user/bcrypt/BcryptService";
 
-// Novo tipo para o que será retornado ao cliente (UserProps sem o campo 'password')
+
 export type UserResponse = Omit<UserProps, 'password'>;
 
 export class CreateUserApp {
@@ -45,4 +45,5 @@ export class CreateUserApp {
       token 
     };
   }
+
 }

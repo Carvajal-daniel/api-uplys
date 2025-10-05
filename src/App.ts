@@ -19,7 +19,7 @@ export class App {
           if (allowedOrigins.includes(origin)) return callback(null, true);
           callback(new Error("Não permitido por CORS"));
         },
-        credentials: true, // ✅ obrigatório para enviar cookies cross-site
+        credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
       })

@@ -16,11 +16,18 @@ export const loginController = async (req: Request, res: Response) => {
     const { user, token } = await loginUserUseCase.login(loginData);
 
     // ✅ Define o token como cookie HTTP-only
- res.cookie("token", token, {
+ /*res.cookie("token", token, {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production", // false em dev
   sameSite: "strict",
   maxAge: 1000 * 60 * 60, // 1h
+}); */
+
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,       // HTTPS obrigatório
+  sameSite: "none",   // permite cross-site
+  maxAge: 1000 * 60 * 60,
 });
 
 

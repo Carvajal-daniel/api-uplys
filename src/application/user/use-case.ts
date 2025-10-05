@@ -14,7 +14,6 @@ export class CreateUserApp {
     private bcryptService: BcryptService
   ) {}
 
-  // 💡 Ajuste no tipo de retorno para garantir a segurança
   async create(data: CreateUserDTO): Promise<{ user: UserResponse; token: string }> {
     // validação com Zod
     const validation = ValidateUser.safeParse(data);

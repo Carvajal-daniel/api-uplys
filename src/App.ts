@@ -1,33 +1,29 @@
 import { Application } from "express";
 import * as express from "express";
+import * as cookieParser from "cookie-parser";
 import userRoutes from "./infra/routes/user.routes";
 import * as cors from "cors";
 
-
-const allowedOrigins = [
-  "http://localhost:3001",
-  "https://uplys.vercel.app"
-];
+const allowedOrigins = ["http://localhost:3001", "https://uplys.vercel.app"];
 export class App {
   public app: Application;
-
-  
 
   constructor() {
     this.app = express();
     this.app.use(express.json());
-   this.app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      callback(new Error("Não permitido por CORS"));
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+    this.app.use(cookieParser());
+    this.app.use(
+      cors({
+        origin: (origin, callback) => {
+          if (!origin) return callback(null, true);
+          if (allowedOrigins.includes(origin)) return callback(null, true);
+          callback(new Error("Não permitido por CORS"));
+        },
+        credentials: true, // ✅ obrigatório para enviar cookies cross-site
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+      })
+    );
 
     // Configura as rotas
     this.setupRoutes();

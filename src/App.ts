@@ -4,7 +4,7 @@ import * as cookieParser from "cookie-parser";
 import userRoutes from "./infra/routes/user.routes";
 import * as cors from "cors";
 
-const allowedOrigins = ["http://localhost:3001", "https://uplys.vercel.app"];
+const allowedOrigins = ["http://localhost:3001", "https://uplys.com.br"];
 export class App {
   public app: Application;
 

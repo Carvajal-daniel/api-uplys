@@ -1,8 +1,10 @@
 import type { IUserRepository } from "../../domain/user/user-repository";
-import type { ITokebService } from "../../domain/user/services/ITokenService";
+import type { ITokenService } from "../../domain/user/services/ITokenService";
 import type { CreateUserDTO, UserProps } from "../../domain/user/user-entities";
 import { ValidateUser } from "./valitadion";
 import type { BcryptService } from "../../infra/user/bcrypt/BcryptService";
+import { validateCPF } from "../../utils/user/validateCPF";
+import { logger } from "../../shared/userLogs/logger";
 
 
 export type UserResponse = Omit<UserProps, 'password'>;
@@ -10,7 +12,7 @@ export type UserResponse = Omit<UserProps, 'password'>;
 export class CreateUserApp {
   constructor(
     private userRepo: IUserRepository,
-    private jwtService: ITokebService,
+    private jwtService: ITokenService,
     private bcryptService: BcryptService
   ) {}
 
@@ -23,6 +25,14 @@ export class CreateUserApp {
 
     const validData = validation.data;
 
+    //validar cpf
+
+    if(!validateCPF(validData.cpf)) {
+      logger.error("Invalid CPF: %s", validData.cpf);
+      throw new Error("INVALID_CPF");
+    }
+
+    
     // 1. Geração do hash da senha
     const hashedPassword = await this.bcryptService.hash(validData.password);
 

@@ -1,4 +1,5 @@
-export interface ITokebService {
-  generate(payload: object): string
-  verify(token: string): object | null
+import { JwtPayload } from 'jsonwebtoken';
+export interface ITokenService {
+  generate(payload: JwtPayload): string;
+  verify(token: string): JwtPayload | null;
 }

@@ -1,5 +1,5 @@
+import type { ITokenService } from "../../domain/user/services/ITokenService";
 
-import type { ITokebService } from "../../domain/user/services/ITokenService";
 import type { LoginDTO, UserProps } from "../../domain/user/user-entities";
 import type { IUserRepository } from "../../domain/user/user-repository";
 import type { BcryptService } from "../../infra/user/bcrypt/BcryptService";
@@ -14,7 +14,7 @@ export interface LoginResponse {
 export class LoginApp {
   constructor(
     private userRepo: IUserRepository,
-    private jwtService: ITokebService,
+    private jwtService: ITokenService,
     private bcryptService: BcryptService
   ) {}
 

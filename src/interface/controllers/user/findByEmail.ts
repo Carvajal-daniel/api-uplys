@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { loginUserUseCase } from "../../../infra/di/container"; 
+import { loginUserUseCase } from "../../../infra/di/container";
 import type { LoginDTO } from "../../../domain/user/user-entities";
 
 export const loginController = async (req: Request, res: Response) => {
@@ -8,35 +8,25 @@ export const loginController = async (req: Request, res: Response) => {
     const { email, password } = loginData;
 
     if (!email || !password) {
-      return res.status(400).json({ 
-        message: "El email y la contraseña son requeridos." 
+      return res.status(400).json({
+        message: "El email y la contraseña son requeridos.",
       });
     }
 
     const { user, token } = await loginUserUseCase.login(loginData);
 
-    // ✅ Define o token como cookie HTTP-only
- /*res.cookie("token", token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // false em dev
-  sameSite: "strict",
-  maxAge: 1000 * 60 * 60, // 1h
-}); */
-
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  maxAge: 1000 * 60 * 60,
-});
-
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 1000 * 60 * 60,
+    });
 
     // ✅ Retorna apenas os dados do usuário (sem o token)
     return res.status(200).json({
       message: "Login bem-sucedido",
       user,
     });
-
   } catch (error: any) {
     if (error.message === "USER_NOT_FOUND") {
       return res.status(401).json({ message: "Email não encontrado" });
@@ -45,6 +35,8 @@ res.cookie("token", token, {
       return res.status(401).json({ message: "Senha incorreta" });
     }
 
-    return res.status(500).json({ message: "Ocorreu um erro interno do servidor" });
+    return res
+      .status(500)
+      .json({ message: "Ocorreu um erro interno do servidor" });
   }
 };

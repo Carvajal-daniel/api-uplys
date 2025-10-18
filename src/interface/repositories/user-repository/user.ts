@@ -1,7 +1,8 @@
 import { UserProps } from "../../../domain/user/user-entities";
 import type { IUserRepository } from "../../../domain/user/user-repository";
 import { userTable } from "../../../infra/db/schema";
-import { db } from "../../../infra/db";
+
+import { db } from "../../../infra/db/schema/connection";
 import { logger } from "../../../shared/userLogs/logger";
 import { eq, or } from "drizzle-orm";
 
@@ -30,7 +31,7 @@ export class UserRepository implements IUserRepository {
         if (existingUser.cpf === userData.cpf) {
           throw new Error("CPF_DUPLICATE: CPF já cadastrado");
         }
-        // 🚨 ADICIONADO: Novo erro para telefone
+        
         if (existingUser.phone === userData.phone) {
           throw new Error("PHONE_DUPLICATE: Telefone já cadastrado");
         }

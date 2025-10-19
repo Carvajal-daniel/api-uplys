@@ -16,15 +16,23 @@ export class App {
 
   constructor() {
     this.app = express();
+    
+    // 🛑 CORREÇÃO VITAL: Adicionar 'trust proxy' para o Render 🛑
+    // Isso instrui o Express a confiar nos cabeçalhos do proxy reverso, 
+    // reconhecendo a conexão como HTTPS e permitindo o uso do Cookie 'Secure'.
+    this.app.set('trust proxy', 1); 
+    
     this.app.use(express.json());
     
-    // ⭐️ Adicionamos um middleware para verificar e forçar o SameSite=None e Secure=true em produção ⭐️
+
     this.app.use((req, res, next) => {
       const isProduction = process.env.NODE_ENV === 'production';
       const origin = req.headers.origin;
       
-      // Se for produção e a origem for permitida, forçamos HTTPS para cookies
+    
       if (isProduction && origin && allowedOrigins.includes(origin)) {
+        // Nota: Esta lógica de setHeader('Set-Cookie') é redundante se você usa res.cookie, 
+        // mas foi mantida para garantir compatibilidade com o código anterior.
         res.setHeader('Set-Cookie', 'SameSite=None; Secure');
       }
       next();
@@ -34,18 +42,17 @@ export class App {
     this.app.use(
       cors({
         origin: (origin, callback) => {
-          // Permite requisições sem origem (como Postman ou requisições do mesmo servidor)
+
           if (!origin) return callback(null, true); 
           
-          // Verifica se a origem está na lista
           if (allowedOrigins.includes(origin)) {
             return callback(null, true);
           }
           
-          // Se não estiver permitido
+          
           callback(new Error(`Não permitido por CORS: ${origin}`));
         },
-        // ⭐️ ESSENCIAL para enviar e receber cookies em requisições cross-site ⭐️
+        
         credentials: true, 
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],

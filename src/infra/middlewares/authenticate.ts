@@ -22,7 +22,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   const userId = decoded.id || decoded.sub;
   if (!userId) return res.status(403).json({ message: "Token inválido: id ausente" });
 
-  // ✅ Atribui ao req.user
+
   (req as any).user = {
     id: userId,
     email: decoded.email,

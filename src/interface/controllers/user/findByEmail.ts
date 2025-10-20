@@ -17,13 +17,13 @@ export const loginController = async (req: Request, res: Response) => {
     const { user, token } = await loginUserUseCase.login(loginData);
 
     // ⚡️ Cookie seguro para cross-site
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // obrigatório em produção
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // obrigatório para cross-site
-      domain: COOKIE_DOMAIN, // domínio correto
-      maxAge: 1000 * 60 * 60, // 1 hora
-    });
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,             // OBRIGATÓRIO em produção (HTTPS)
+  sameSite: "none",         // OBRIGATÓRIO para cross-site (Vercel <-> Render)
+  domain: ".uplys.com.br",  // seu domínio principal
+  maxAge: 1000 * 60 * 60,   // 1 hora
+});
 
     return res.status(200).json({
       message: "Login bem-sucedido",

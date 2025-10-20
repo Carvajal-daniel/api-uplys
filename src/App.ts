@@ -4,19 +4,13 @@ import * as cookieParser from "cookie-parser";
 import userRoutes from "./infra/routes/user.routes";
 import * as cors from "cors";
 
-const allowedOrigins = [
-  "https://uplys.com.br",
-  "https://www.uplys.com.br",
-  "https://uplys.vercel.app",
-];
-
 export class App {
   public app: Application;
 
   constructor() {
     this.app = express();
 
-    // ⚡️ necessário para cookies secure atrás do proxy (Render/Cloud)
+    // ⚡️ Essencial para cookies secure atrás do proxy (Render/Cloud)
     this.app.set("trust proxy", 1);
 
     this.app.use(express.json());
@@ -30,16 +24,22 @@ export class App {
 
           if (!origin) return callback(null, true); // Postman, SSR, etc.
 
-          if (isDev) {
-            // Permite qualquer localhost com qualquer porta
-            if (/^https?:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) return callback(null, true);
+          // Permite qualquer localhost no dev
+          if (isDev && /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+            return callback(null, true);
           }
+
+          const allowedOrigins = [
+            process.env.NEXT_PUBLIC_FRONTEND_DOMAIN,
+            `https://www.${process.env.NEXT_PUBLIC_FRONTEND_DOMAIN}`,
+            "https://uplys.vercel.app",
+          ];
 
           if (allowedOrigins.includes(origin)) return callback(null, true);
 
           return callback(new Error(`CORS bloqueado para origem: ${origin}`));
         },
-        credentials: true, // ⚠️ permite enviar cookies cross-site
+        credentials: true, // ⚠️ envia cookies cross-site
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
       })

@@ -19,11 +19,15 @@ export const loginController = async (req: Request, res: Response) => {
     // ⚡️ Cookie seguro para cross-site
 res.cookie("token", token, {
   httpOnly: true,
-  secure: true,             // OBRIGATÓRIO em produção (HTTPS)
-  sameSite: "none",         // OBRIGATÓRIO para cross-site (Vercel <-> Render)
-  domain: ".uplys.com.br",  // seu domínio principal
-  maxAge: 1000 * 60 * 60,   // 1 hora
+  secure: process.env.NODE_ENV === "production",            // HTTPS obrigatório em produção
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site
+  domain: process.env.NODE_ENV === "production"
+          ? ".uplys.com.br"   // ✅ ponto inicial é essencial para subdomínio
+          : "localhost",
+  maxAge: 1000 * 60 * 60, // 1 hora
 });
+
+
 
     return res.status(200).json({
       message: "Login bem-sucedido",

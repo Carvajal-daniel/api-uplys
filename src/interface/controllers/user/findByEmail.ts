@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { loginUserUseCase } from "../../../infra/di/container";
 import type { LoginDTO } from "../../../domain/user/user-entities";
 
-const PRODUCTION_DOMAIN_ROOT = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN || "https://www.uplys.com.br";
+const PRODUCTION_DOMAIN_ROOT = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN || ".uplys.com.br";
 const COOKIE_DOMAIN = process.env.NODE_ENV === "production" ? PRODUCTION_DOMAIN_ROOT : "localhost";
 
 export const loginController = async (req: Request, res: Response) => {

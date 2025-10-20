@@ -2,8 +2,8 @@ import type { Request, Response } from "express";
 import { loginUserUseCase } from "../../../infra/di/container";
 import type { LoginDTO } from "../../../domain/user/user-entities";
 
-const PRODUCTION_DOMAIN = ".uplys.com.br"; // domínio raiz para cookies
-const COOKIE_MAX_AGE = 1000 * 60 * 60; // 1 hora
+const PRODUCTION_DOMAIN_ROOT = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN || ".uplys.com.br";
+const COOKIE_DOMAIN = process.env.NODE_ENV === "production" ? PRODUCTION_DOMAIN_ROOT : "localhost";
 
 export const loginController = async (req: Request, res: Response) => {
   try {
@@ -17,15 +17,18 @@ export const loginController = async (req: Request, res: Response) => {
     const { user, token } = await loginUserUseCase.login(loginData);
 
     // ⚡️ Cookie seguro para cross-site
-  res.cookie("token", token, {
-  httpOnly: true,          // 🔒 só acessível pelo backend
-  secure: process.env.NODE_ENV === "production", // 🔐 HTTPS obrigatório em produção
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site
-  domain: ".uplys.com.br", // ⚠️ deve ser seu domínio raiz
-  maxAge: 1000 * 60 * 60,  // 1 hora
-});
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // obrigatório em produção
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // obrigatório para cross-site
+      domain: COOKIE_DOMAIN, // domínio correto
+      maxAge: 1000 * 60 * 60, // 1 hora
+    });
 
-    return res.status(200).json({ message: "Login bem-sucedido", user });
+    return res.status(200).json({
+      message: "Login bem-sucedido",
+      user,
+    });
   } catch (error: any) {
     if (error.message === "USER_NOT_FOUND") return res.status(401).json({ message: "Email não encontrado" });
     if (error.message === "INVALID_PASSWORD") return res.status(401).json({ message: "Senha incorreta" });

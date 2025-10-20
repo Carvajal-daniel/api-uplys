@@ -19,43 +19,31 @@ export class App {
   constructor() {
     this.app = express();
 
-    // 🟩 1. Render precisa disso para que 'secure cookies' funcionem
+    // ⚡️ necessário para cookies secure atrás do proxy (Render/Cloud)
     this.app.set("trust proxy", 1);
 
     this.app.use(express.json());
     this.app.use(cookieParser());
 
-    // 🟩 2. Configuração de CORS correta e simplificada
+    // CORS seguro e simplificado
     this.app.use(
       cors({
         origin: (origin, callback) => {
-          if (!origin) return callback(null, true);
-          if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-          }
+          if (!origin) return callback(null, true); // permite requests sem origin (Postman, SSR)
+          if (allowedOrigins.includes(origin)) return callback(null, true);
           callback(new Error(`CORS bloqueado para origem: ${origin}`));
         },
-        credentials: true, // ⚠️ necessário para enviar cookies entre domínios
+        credentials: true, // envia cookies cross-site
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
       })
     );
 
-    // 🟩 3. Middleware opcional — mas sem mexer no header Set-Cookie diretamente!
-    // O 'Set-Cookie' é definido pelo res.cookie() no controller,
-    // aqui não precisa (e pode até sobrescrever indevidamente).
-    // Portanto, REMOVA o middleware abaixo do seu código anterior:
-    // this.app.use((req, res, next) => {...})
-
-    // 🟩 4. Rotas
     this.setupRoutes();
   }
 
   private setupRoutes(): void {
-    this.app.get("/", (req, res) => {
-      res.send("Hello World!");
-    });
-
+    this.app.get("/", (req, res) => res.send("Hello World!"));
     this.app.use("/api", userRoutes);
   }
 }

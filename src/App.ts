@@ -1,3 +1,4 @@
+// src/app.ts
 import { Application } from "express";
 import * as express from "express";
 import * as cookieParser from "cookie-parser";
@@ -6,8 +7,6 @@ import * as cors from "cors";
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:5803",
   "https://uplys.com.br",
   "https://www.uplys.com.br",
   "https://uplys.vercel.app",
@@ -19,21 +18,21 @@ export class App {
   constructor() {
     this.app = express();
 
-    // ⚡️ necessário para cookies secure atrás do proxy (Render/Cloud)
+    // 🔹 Essencial para cookies secure atrás do proxy (Render/Cloud)
     this.app.set("trust proxy", 1);
 
     this.app.use(express.json());
     this.app.use(cookieParser());
 
-    // CORS seguro e simplificado
+    // 🔹 Configuração de CORS correta para cookies cross-site
     this.app.use(
       cors({
         origin: (origin, callback) => {
-          if (!origin) return callback(null, true); // permite requests sem origin (Postman, SSR)
+          if (!origin) return callback(null, true); // Postman ou SSR
           if (allowedOrigins.includes(origin)) return callback(null, true);
           callback(new Error(`CORS bloqueado para origem: ${origin}`));
         },
-        credentials: true, // envia cookies cross-site
+        credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
       })

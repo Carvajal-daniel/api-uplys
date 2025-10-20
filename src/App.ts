@@ -5,10 +5,12 @@ import userRoutes from "./infra/routes/user.routes";
 import * as cors from "cors";
 
 const allowedOrigins = [
-  "http://localhost:3000", 
-  "http://localhost:3001", 
-  "http://localhost:5803", 
-  "https://www.uplys.com.br"
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:5803",
+  "https://uplys.com.br",
+  "https://www.uplys.com.br",
+  "https://uplys.vercel.app",
 ];
 
 export class App {
@@ -16,54 +18,39 @@ export class App {
 
   constructor() {
     this.app = express();
-    
-    // 🛑 CORREÇÃO VITAL: Adicionar 'trust proxy' para o Render 🛑
-    // Isso instrui o Express a confiar nos cabeçalhos do proxy reverso, 
-    // reconhecendo a conexão como HTTPS e permitindo o uso do Cookie 'Secure'.
-    this.app.set('trust proxy', 1); 
-    
+
+    // 🟩 1. Render precisa disso para que 'secure cookies' funcionem
+    this.app.set("trust proxy", 1);
+
     this.app.use(express.json());
-    
-
-    this.app.use((req, res, next) => {
-      const isProduction = process.env.NODE_ENV === 'production';
-      const origin = req.headers.origin;
-      
-    
-      if (isProduction && origin && allowedOrigins.includes(origin)) {
-        // Nota: Esta lógica de setHeader('Set-Cookie') é redundante se você usa res.cookie, 
-        // mas foi mantida para garantir compatibilidade com o código anterior.
-        res.setHeader('Set-Cookie', 'SameSite=None; Secure');
-      }
-      next();
-    });
-
     this.app.use(cookieParser());
+
+    // 🟩 2. Configuração de CORS correta e simplificada
     this.app.use(
       cors({
         origin: (origin, callback) => {
-
-          if (!origin) return callback(null, true); 
-          
+          if (!origin) return callback(null, true);
           if (allowedOrigins.includes(origin)) {
             return callback(null, true);
           }
-          
-          
-          callback(new Error(`Não permitido por CORS: ${origin}`));
+          callback(new Error(`CORS bloqueado para origem: ${origin}`));
         },
-        
-        credentials: true, 
+        credentials: true, // ⚠️ necessário para enviar cookies entre domínios
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
       })
     );
 
-    // Configura as rotas
+    // 🟩 3. Middleware opcional — mas sem mexer no header Set-Cookie diretamente!
+    // O 'Set-Cookie' é definido pelo res.cookie() no controller,
+    // aqui não precisa (e pode até sobrescrever indevidamente).
+    // Portanto, REMOVA o middleware abaixo do seu código anterior:
+    // this.app.use((req, res, next) => {...})
+
+    // 🟩 4. Rotas
     this.setupRoutes();
   }
 
-  // Método privado para configurar rotas
   private setupRoutes(): void {
     this.app.get("/", (req, res) => {
       res.send("Hello World!");

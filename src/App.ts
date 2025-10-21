@@ -16,7 +16,7 @@ export class App {
     this.app.use(express.json());
     this.app.use(cookieParser());
 
- const allowedOrigins = ["https://uplys.com.br", "https://www.uplys.com.br", "localhost:5800"];
+ const allowedOrigins = ["https://uplys.com.br", "https://www.uplys.com.br", "http://localhost:3001"];
 this.app.use(
   cors({
     origin: (origin, callback) => {

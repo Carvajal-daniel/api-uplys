@@ -10,21 +10,22 @@ export class App {
   constructor() {
     this.app = express();
 
-    // ⚡️ Essencial para cookies secure atrás de proxy (Render, Vercel, etc.)
+  
     this.app.set("trust proxy", 1);
 
     this.app.use(express.json());
     this.app.use(cookieParser());
 
-    // 🚀 CORS liberado para qualquer origem
-    this.app.use(
-      cors({
-        origin: true, // aceita qualquer origem dinamicamente
-        credentials: true, // permite cookies e headers autenticados
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-      })
-    );
+ 
+ this.app.use(
+  cors({
+    origin: process.env.NEXT_PUBLIC_FRONTEND_DOMAIN, // pega do .env
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 
     this.setupRoutes();
   }

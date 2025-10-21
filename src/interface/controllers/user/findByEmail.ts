@@ -16,15 +16,15 @@ export const loginController = async (req: Request, res: Response) => {
 
     const { user, token } = await loginUserUseCase.login(loginData);
 
-    // ⚡️ Cookie seguro para cross-site
+
 res.cookie("token", token, {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",            // HTTPS obrigatório em produção
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site
+  secure: process.env.NODE_ENV === "production",     
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   domain: process.env.NODE_ENV === "production"
-          ? ".uplys.com.br"   // ✅ ponto inicial é essencial para subdomínio
+          ? ".uplys.com.br"   
           : "localhost",
-  maxAge: 1000 * 60 * 60, // 1 hora
+  maxAge: 1000 * 60 * 60,
 });
 
 

@@ -16,13 +16,17 @@ export class App {
     this.app.use(express.json());
     this.app.use(cookieParser());
 
- 
- this.app.use(
+ const allowedOrigins = ["https://uplys.com.br", "https://www.uplys.com.br"];
+this.app.use(
   cors({
-    origin: process.env.NEXT_PUBLIC_FRONTEND_DOMAIN,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // Postman ou SSR
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error(`CORS bloqueado para origem: ${origin}`));
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+    allowedHeaders: ["Content-Type","Authorization"],
   })
 );
 

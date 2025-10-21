@@ -19,13 +19,13 @@ export const loginController = async (req: Request, res: Response) => {
 
     const { user, token } = await loginUserUseCase.login(loginData);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      domain: process.env.NODE_ENV === "production" ? ".uplys.com.br" : undefined,
-      maxAge: 1000 * 60 * 60,
-    });
+   res.cookie("token", token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production", // HTTPS apenas em prod
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  domain: process.env.NODE_ENV === "production" ? ".uplys.com.br" : undefined, // melhor para localhost
+  maxAge: 1000 * 60 * 60,
+});
 
     return res.status(200).json({
       message: "Login bem-sucedido",

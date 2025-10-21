@@ -3,7 +3,8 @@ import * as express from "express";
 import * as cookieParser from "cookie-parser";
 import userRoutes from "./infra/routes/user.routes";
 import * as cors from "cors";
-import "dotenv/config"
+import * as dotenv from "dotenv";
+dotenv.config();
 
 export class App {
   public app: Application;

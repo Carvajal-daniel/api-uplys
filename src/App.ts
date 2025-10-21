@@ -3,6 +3,8 @@ import * as express from "express";
 import * as cookieParser from "cookie-parser";
 import userRoutes from "./infra/routes/user.routes";
 import * as cors from "cors";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 export class App {
   public app: Application;
@@ -20,6 +22,7 @@ export class App {
 const allowedOrigins = [
   process.env.NEXT_PUBLIC_FRONTEND_DOMAIN,
   process.env.NEXT_PUBLIC_FRONTEND_DOMAIN_WWW,
+  "http://localhost:3001"    
 ];
 
 this.app.use(

@@ -3,8 +3,7 @@ import * as express from "express";
 import * as cookieParser from "cookie-parser";
 import userRoutes from "./infra/routes/user.routes";
 import * as cors from "cors";
-import * as dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config"
 
 export class App {
   public app: Application;
@@ -18,17 +17,15 @@ export class App {
     this.app.use(express.json());
     this.app.use(cookieParser());
 
-
 const allowedOrigins = [
-  process.env.NEXT_PUBLIC_FRONTEND_DOMAIN,
-  process.env.NEXT_PUBLIC_FRONTEND_DOMAIN_WWW,
-  "http://localhost:3001"    
+  process.env.FRONTEND_DOMAIN,
+  process.env.FRONTEND_DOMAIN_WWW,
+  "http://localhost:3001",
 ];
-
 this.app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // SSR, Postman
+      if (!origin) return callback(null, true); // Postman ou SSR
       if (allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error(`CORS bloqueado para origem: ${origin}`));
     },

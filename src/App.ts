@@ -10,36 +10,17 @@ export class App {
   constructor() {
     this.app = express();
 
-    // ⚡️ Essencial para cookies secure atrás do proxy (Render/Cloud)
+    // ⚡️ Essencial para cookies secure atrás de proxy (Render, Vercel, etc.)
     this.app.set("trust proxy", 1);
 
     this.app.use(express.json());
     this.app.use(cookieParser());
 
-    // CORS seguro e flexível
+    // 🚀 CORS liberado para qualquer origem
     this.app.use(
       cors({
-        origin: (origin, callback) => {
-          const isDev = process.env.NODE_ENV !== "production";
-
-          if (!origin) return callback(null, true); // Postman, SSR, etc.
-
-          // Permite qualquer localhost no dev
-          if (isDev && /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
-            return callback(null, true);
-          }
-
-          const allowedOrigins = [
-            process.env.NEXT_PUBLIC_FRONTEND_DOMAIN,
-            `https://www.${process.env.NEXT_PUBLIC_FRONTEND_DOMAIN}`,
-            "https://uplys.vercel.app",
-          ];
-
-          if (allowedOrigins.includes(origin)) return callback(null, true);
-
-          return callback(new Error(`CORS bloqueado para origem: ${origin}`));
-        },
-        credentials: true, // ⚠️ envia cookies cross-site
+        origin: true, // aceita qualquer origem dinamicamente
+        credentials: true, // permite cookies e headers autenticados
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
       })

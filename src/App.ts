@@ -3,6 +3,9 @@ import * as express from "express";
 import * as cookieParser from "cookie-parser";
 import userRoutes from "./infra/routes/user.routes";
 import * as cors from "cors";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 export class App {
   public app: Application;
@@ -10,26 +13,28 @@ export class App {
   constructor() {
     this.app = express();
 
-  
     this.app.set("trust proxy", 1);
-
     this.app.use(express.json());
     this.app.use(cookieParser());
 
- const allowedOrigins = ["https://uplys.com.br", "https://www.uplys.com.br", "http://localhost:3001"];
-this.app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // Postman ou SSR
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error(`CORS bloqueado para origem: ${origin}`));
-    },
-    credentials: true,
-    methods: ["GET","POST","PUT","DELETE","OPTIONS"],
-    allowedHeaders: ["Content-Type","Authorization"],
-  })
-);
+    const allowedOrigins = [
+      process.env.FRONTEND_DOMAIN,
+      process.env.FRONTEND_DOMAIN_WWW,
+      "http://localhost:3001", 
+    ];
 
+    this.app.use(
+      cors({
+        origin: (origin, callback) => {
+          if (!origin) return callback(null, true); // Postman ou SSR
+          if (allowedOrigins.includes(origin)) return callback(null, true);
+          return callback(new Error(`CORS bloqueado para origem: ${origin}`));
+        },
+        credentials: true, 
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+      })
+    );
 
     this.setupRoutes();
   }

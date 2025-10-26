@@ -1,33 +1,22 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, real, jsonb, integer } from "drizzle-orm/pg-core";
-import { userTable } from "./users";
+// src/infra/db/schema/business.ts
+import { pgTable, text, uuid, timestamp, jsonb, numeric } from "drizzle-orm/pg-core";
 
-export const businessTable = pgTable("business", {
-  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
-
-  userId: text("user_id")
-    .notNull()
-    .references(() => userTable.id, { onDelete: "cascade" }),
-
+export const businesses = pgTable("businesses", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id").notNull(),
   name: text("name").notNull(),
   niche: text("niche").notNull(),
-  location: text("location").notNull(),
-
-  revenue: real("revenue"),
-  expenses: real("expenses"),
-  avgServicePrice: real("avg_service_price"),
-
-  services: jsonb("services").$type<string[]>(),
-  employees: integer("employees"),
-  hours: text("hours"),
-  usesSocialMedia: boolean("uses_social_media").default(false),
-  socialPlatforms: jsonb("social_platforms").$type<string[]>(),
-  challenges: text("challenges"),
-  reportFrequency: text("report_frequency"),
-
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
+  description: text("description"),
+  operatingYears: text("operating_years"),
+  location: jsonb("location").notNull(),
+  amenities: jsonb("amenities"),
+  services: jsonb("services").notNull(),
+  socialPlatforms: jsonb("social_platforms"),
+  businessHours: jsonb("business_hours").notNull(),
+  revenue: numeric("revenue"),
+  expenses: numeric("expenses"),
+  avgServicePrice: numeric("avg_service_price").notNull(),
+  employees: numeric("employees"),
+  postingFrequency: text("posting_frequency").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });

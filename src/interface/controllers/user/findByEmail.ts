@@ -23,7 +23,7 @@ export const loginController = async (req: Request, res: Response) => {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production", // HTTPS apenas em prod
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  domain: process.env.NODE_ENV === "production" ? ".uplys.com.br" : undefined, // melhor para localhost
+  domain: process.env.NODE_ENV === "production" ? ".uplys.com.br" : undefined, 
   maxAge: 1000 * 60 * 60,
 });
 

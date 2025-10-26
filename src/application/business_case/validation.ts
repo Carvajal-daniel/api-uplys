@@ -1,24 +1,55 @@
+// src/interface/repositories/business_repo/validation.ts
 import { z } from "zod";
 
-export const validateBusiness = z.object({
-  name: z.string()
-    .min(3, "O nome deve ter pelo menos 3 caracteres")
-    .max(50, "O nome deve ter no máximo 50 caracteres"),
-  niche: z.string()
-    .min(3, "O nicho deve ter pelo menos 3 caracteres")
-    .max(50, "O nicho deve ter no máximo 50 caracteres"),
-  location: z.string()
-    .min(3, "A localização deve ter pelo menos 3 caracteres")
-    .max(50, "A localização deve ter no máximo 50 caracteres"),
-  userId: z.string().uuid(),
+export const BusinessSchema = z.object({
+  userId: z.string(),
+  name: z.string().min(1, "Nome obrigatório"),
+  niche: z.string().min(1, "Nicho obrigatório"),
+  description: z.string().optional(),
+  operatingYears: z.enum(["menos de 1 ano", "1-3 anos", "+3 anos"]).optional(),
+  location: z.object({
+    cep: z.string().optional(),
+    street: z.string().optional(),
+    number: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    country: z.string().optional(),
+  }).optional(),
+  amenities: z.object({
+    airConditioning: z.boolean().optional(),
+    coffee: z.boolean().optional(),
+    water: z.boolean().optional(),
+    wifi: z.boolean().optional(),
+    parking: z.boolean().optional(),
+  }).optional(),
+  services: z.array(z.string()).optional(),
+  employees: z.number().optional(),
   revenue: z.number().optional(),
   expenses: z.number().optional(),
   avgServicePrice: z.number().optional(),
-  services: z.array(z.string()).optional(),
-  employees: z.number().optional(),
-  hours: z.string().optional(),
   usesSocialMedia: z.boolean().optional(),
   socialPlatforms: z.array(z.string()).optional(),
+  postingFrequency: z.enum([
+    "1x por semana",
+    "2x por semana",
+    "3x por semana",
+    "Diariamente",
+    "Casualmente",
+  ]).refine((val) => !!val, { message: "Frequência de postagem obrigatória" }),
   challenges: z.string().optional(),
-  reportFrequency: z.enum(["weekly", "monthly"]).optional(),
+  reportFrequency: z.string().optional(),
+  capacity: z.number().optional(),
+  delivery: z.boolean().optional(),
+  ownerExperienceYears: z.number().optional(),
+  businessHours: z.array(
+    z.object({
+      day: z.enum(["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]),
+      open: z.string(),
+      close: z.string()
+    })
+  ).optional(),
 });
+
+export function validateBusiness(data: unknown) {
+  return BusinessSchema.safeParse(data);
+}

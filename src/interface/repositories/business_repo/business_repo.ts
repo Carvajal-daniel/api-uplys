@@ -1,61 +1,58 @@
-
-import type { IBusinessRepository } from "../../../domain/business/repository";
-import type { BusinessEntity, BusinessProps } from "../../../domain/business/entitys";
-import { businessTable } from "../../../infra/db/schema";
+// src/interface/repositories/business_repo/business_repo.ts
+import { v4 as uuid } from "uuid";
 import { db } from "../../../infra/db/schema/connection";
+import { businesses } from "../../../infra/db/schema/business";
 import { eq } from "drizzle-orm";
-import { logger } from "../../../shared/userLogs/logger";
+import type { BusinessProps, BusinessEntity } from "../../../domain/business/entitys";
 
-export class BusinessRepository implements IBusinessRepository {
-  async create(
-    data: BusinessProps): Promise<BusinessEntity> {
-    try {
-      const [newBusiness] = await db.insert(businessTable).values(data).returning();
-      return newBusiness as BusinessEntity;
-    } catch (error: any) {
-      logger.error("Error creating business: %o", { error, data });
-      throw error;
-    }
+function normalizeBusinessData(data: BusinessProps) {
+  return {
+    id: uuid(),
+    userId: data.userId,
+    name: data.name,
+    niche: data.niche,
+    description: data.description ?? null,
+    operatingYears: data.operatingYears ?? null,
+    location: JSON.stringify(data.location ?? {}),
+    amenities: JSON.stringify(data.amenities ?? {}),
+    services: JSON.stringify(data.services ?? []),
+    socialPlatforms: JSON.stringify(data.socialPlatforms ?? []),
+    businessHours: JSON.stringify(data.businessHours ?? []),
+    revenue: data.revenue?.toString() ?? null,
+    expenses: data.expenses?.toString() ?? null,
+    avgServicePrice: (data.avgServicePrice ?? 0).toString(),
+    employees: data.employees?.toString() ?? null,
+    postingFrequency: data.postingFrequency ?? "Casualmente",
+    createdAt: new Date(),
+  };
+}
+
+function parseBusinessEntity(b: any): BusinessEntity {
+  return {
+    ...b,
+    revenue: b.revenue ? Number(b.revenue) : undefined,
+    expenses: b.expenses ? Number(b.expenses) : undefined,
+    avgServicePrice: b.avgServicePrice ? Number(b.avgServicePrice) : undefined,
+    employees: b.employees ? Number(b.employees) : undefined,
+    location: typeof b.location === "string" ? JSON.parse(b.location) : {},
+    amenities: typeof b.amenities === "string" ? JSON.parse(b.amenities) : {},
+    services: typeof b.services === "string" ? JSON.parse(b.services) : [],
+    socialPlatforms: typeof b.socialPlatforms === "string" ? JSON.parse(b.socialPlatforms) : [],
+    businessHours: typeof b.businessHours === "string" ? JSON.parse(b.businessHours) : [],
+  };
+}
+
+export class BusinessRepository {
+  async create(data: BusinessProps): Promise<BusinessEntity> {
+    const newData = normalizeBusinessData(data);
+
+    const [newBusiness] = await db.insert(businesses).values(newData).returning();
+
+    return parseBusinessEntity(newBusiness);
   }
 
-  async findById(id: string): Promise<BusinessEntity | null> {
-    try {
-      const [business] = await db.select().from(businessTable).where(eq(businessTable.id, id)).limit(1);
-      return business ? (business as BusinessEntity) : null;
-    } catch (error) {
-      logger.error("Error finding business by ID: %s", id);
-      throw error;
-    }
-  }
-
-  async findByUser(userId: string): Promise<BusinessEntity[]> {
-    try {
-      const businessUser = await db.select().from(businessTable).where(eq(businessTable.userId, userId));
-      return businessUser as BusinessEntity[];
-    } catch (error) {
-      logger.error("Error finding business by user ID: %s", userId);
-      throw error;
-    }
-  }
-
-  async update(
-    id: string,
-    data: BusinessProps): Promise<BusinessEntity | null> {
-    try {
-      const [updatedBusiness] = await db.update(businessTable).set(data).where(eq(businessTable.id, id)).returning();
-      return updatedBusiness ? (updatedBusiness as BusinessEntity) : null;
-    } catch (error) {
-      logger.error("Error updating business: %s", id);
-      throw error;
-    }
-  }
-
-  async delete(id: string): Promise<void> {
-    try {
-      await db.delete(businessTable).where(eq(businessTable.id, id));
-    } catch (error) {
-      logger.error("Error deleting business: %s", id);
-      throw error;
-    }
+  async findByUserId(userId: string): Promise<BusinessEntity[]> {
+    const result = await db.select().from(businesses).where(eq(businesses.userId, userId));
+    return result.map(parseBusinessEntity);
   }
 }

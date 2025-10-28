@@ -1,40 +1,36 @@
 // src/domain/business/entitys.ts
-
-export interface Location {
-  cep?: string;
-  street?: string;
-  number?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-}
-
-export interface Amenities {
-  airConditioning?: boolean;
-  coffee?: boolean;
-  water?: boolean;
-  wifi?: boolean;
-  parking?: boolean;
-}
-
-export interface BusinessHour {
-  day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
-  open: string;  // Ex: "09:00"
-  close: string; // Ex: "18:00"
-}
-
-export interface BusinessProps {
+export interface BusinessEntity {
+  id: string;
   userId: string;
   name: string;
   niche: string;
   description?: string;
+  operatingYears?: string;
+  location?: string; 
+  amenities?: string;
+  services?: string;
+  socialPlatforms?: string;
+  businessHours?: string;
+  avgServicePrice?: string;
+  postingFrequency: string;
+  revenue?: string;
+  expenses?: string;
+  employees?: string;
+  createdAt: Date;
+}
+
+export interface CreateBusinessDTO {
+  userId: string;
+  name: string;
+  niche: string;
+  postingFrequency: "1x por semana" | "2x por semana" | "3x por semana" | "Diariamente" | "Casualmente";
+  description?: string;
   operatingYears?: "menos de 1 ano" | "1-3 anos" | "+3 anos";
-  location?: Location;
-  amenities?: Amenities;
+  location?: object;
+  amenities?: object;
   services?: string[];
   socialPlatforms?: string[];
-  businessHours?: BusinessHour[];
-  postingFrequency?: string;
+  businessHours?: { day: string; open: string; close: string }[];
   revenue?: number;
   expenses?: number;
   avgServicePrice?: number;
@@ -45,9 +41,4 @@ export interface BusinessProps {
   capacity?: number;
   delivery?: boolean;
   ownerExperienceYears?: number;
-}
-
-export interface BusinessEntity extends BusinessProps {
-  id: string;
-  createdAt: Date;
 }

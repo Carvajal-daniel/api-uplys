@@ -10,7 +10,11 @@ interface MyJwtPayload {
 
 const jwtService = new JwtService();
 
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const token = req.cookies?.token;
 
   if (!token) return res.status(401).json({ message: "Acesso negado" });
@@ -20,8 +24,8 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 
   // Mapeia sub → id se necessário
   const userId = decoded.id || decoded.sub;
-  if (!userId) return res.status(403).json({ message: "Token inválido: id ausente" });
-
+  if (!userId)
+    return res.status(403).json({ message: "Token inválido: id ausente" });
 
   (req as any).user = {
     id: userId,

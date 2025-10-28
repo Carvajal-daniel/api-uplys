@@ -1,4 +1,4 @@
-import { UserProps } from "../../../domain/user/user-entities";
+import { UserProps, type CreateUserDTO } from "../../../domain/user/user-entities";
 import type { IUserRepository } from "../../../domain/user/user-repository";
 import { userTable } from "../../../infra/db/schema";
 
@@ -7,7 +7,7 @@ import { logger } from "../../../shared/userLogs/logger";
 import { eq, or } from "drizzle-orm";
 
 export class UserRepository implements IUserRepository {
-  async create(userData: UserProps): Promise<UserProps> {
+  async create(userData: CreateUserDTO): Promise<UserProps> {
     try {
       const existing = await db.select()
         .from(userTable)

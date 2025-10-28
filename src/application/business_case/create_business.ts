@@ -1,33 +1,28 @@
-import type { BusinessEntity } from "../../domain/business/entitys";
+// src/application/business/create-business-case.ts
+import type { BusinessEntity, CreateBusinessDTO } from "../../domain/business/entitys";
 import type { BusinessRepository } from "../../interface/repositories/business_repo/business_repo";
 import { logger } from "../../shared/userLogs/logger";
-import { BusinessSchema } from "./validation";
 import { v4 as uuid } from "uuid";
+import { BusinessSchema } from "./validation";
+import type { IBusinessRepository } from "../../domain/business/repository";
 
 export class CreateBusinessCase {
-  constructor(private businessRepo: BusinessRepository) {}
+  constructor(private businessRepo: IBusinessRepository) {}
 
-  async create(data: any): Promise<BusinessEntity> {
-    // Valida os dados recebidos
+  async create(data: CreateBusinessDTO): Promise<BusinessEntity> {
+    // 1. Valida os dados do front
     const parsed = BusinessSchema.safeParse(data);
 
     if (!parsed.success) {
       const formattedErrors = parsed.error.format();
       logger.error("Invalid business data: %o", formattedErrors);
-      throw new Error(
-        `Invalid business data: ${JSON.stringify(formattedErrors)}`
-      );
+      throw new Error(`Invalid business data: ${JSON.stringify(formattedErrors)}`);
     }
 
-    // Adiciona id e createdAt antes de enviar para o repositório
-    const businessToSave = {
-      ...parsed.data,
-      id: uuid(),
-      createdAt: new Date(),
-    };
+    const dataValid = parsed.data;
 
-    // Cria o negócio no banco
-    const newBusiness = await this.businessRepo.create(businessToSave);
+    const newBusiness = await this.businessRepo.create(dataValid as BusinessEntity);
+
     return newBusiness;
   }
 }

@@ -3,8 +3,8 @@ import { z } from "zod";
 
 export const BusinessSchema = z.object({
   userId: z.string(),
-  name: z.string().min(1, "Nome obrigatório"),
-  niche: z.string().min(1, "Nicho obrigatório"),
+  name: z.string().min(1),
+  niche: z.string().min(1),
   description: z.string().optional(),
   operatingYears: z.enum(["menos de 1 ano", "1-3 anos", "+3 anos"]).optional(),
   location: z.object({
@@ -23,33 +23,31 @@ export const BusinessSchema = z.object({
     parking: z.boolean().optional(),
   }).optional(),
   services: z.array(z.string()).optional(),
-  employees: z.number().optional(),
-  revenue: z.number().optional(),
-  expenses: z.number().optional(),
-  avgServicePrice: z.number().optional(),
-  usesSocialMedia: z.boolean().optional(),
   socialPlatforms: z.array(z.string()).optional(),
+  businessHours: z.array(
+    z.object({
+      day: z.enum(["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]),
+      open: z.string(),
+      close: z.string(),
+    })
+  ).optional(),
   postingFrequency: z.enum([
     "1x por semana",
     "2x por semana",
     "3x por semana",
     "Diariamente",
     "Casualmente",
-  ]).refine((val) => !!val, { message: "Frequência de postagem obrigatória" }),
+  ]),
+  revenue: z.number().optional(),
+  expenses: z.number().optional(),
+  avgServicePrice: z.number().optional(),
+  employees: z.number().optional(),
+  usesSocialMedia: z.boolean().optional(),
   challenges: z.string().optional(),
   reportFrequency: z.string().optional(),
   capacity: z.number().optional(),
   delivery: z.boolean().optional(),
   ownerExperienceYears: z.number().optional(),
-  businessHours: z.array(
-    z.object({
-      day: z.enum(["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]),
-      open: z.string(),
-      close: z.string()
-    })
-  ).optional(),
 });
 
-export function validateBusiness(data: unknown) {
-  return BusinessSchema.safeParse(data);
-}
+export type CreateBusinessDTO = z.infer<typeof BusinessSchema>;

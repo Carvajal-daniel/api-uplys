@@ -9,22 +9,21 @@ export const createBusinessController = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Dados inválidos" });
     }
 
-    // ✅ Pega o userId do token autenticado
-    const userId = req.user?.id;
-    if (!userId) {
+   
+    const userEmail = (req as any).user?.email;
+    if (!userEmail) {
       return res.status(401).json({ message: "Usuário não autenticado" });
     }
 
-    // ✅ Adiciona userId ao corpo antes da validação
-    const dataWithUserId = { ...data, userId };
 
-    const newBusiness = await businessCaseInjection.create(dataWithUserId);
+    const newBusiness = await businessCaseInjection.create(data, userEmail);
 
-    return res
-      .status(201)
-      .json({ message: "Negócio criado com sucesso", newBusiness });
-  } catch (error) {
+    return res.status(201).json({
+      message: "Negócio criado com sucesso",
+      newBusiness,
+    });
+  } catch (error: any) {
     logger.error("Erro ao criar negócio: %o", error);
-    return res.status(500).json({ message: "Erro ao criar negócio" });
+    return res.status(400).json({ message: error.message || "Erro ao criar negócio" });
   }
 };

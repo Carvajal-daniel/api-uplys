@@ -5,7 +5,7 @@ import { JwtService } from "../user/auth/JwtService";
 interface MyJwtPayload {
   id: string;
   email?: string;
-  sub?: string; // caso o token use sub
+  sub?: string; 
 }
 
 const jwtService = new JwtService();
@@ -18,6 +18,9 @@ export const authenticate = (
   const token = req.cookies?.token;
 
   if (!token) return res.status(401).json({ message: "Acesso negado" });
+
+
+
 
   const decoded = jwtService.verify(token) as MyJwtPayload | null;
   if (!decoded) return res.status(403).json({ message: "Token inválido" });

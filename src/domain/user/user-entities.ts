@@ -9,6 +9,8 @@ export interface UserProps {
   image?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
+  plan?: string;
+  isActive?: boolean;
 }
 
 
